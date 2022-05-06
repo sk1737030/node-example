@@ -9,6 +9,8 @@ var users = [
 ];
 
 app.use(morgan('dev'));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.get('/users', (req, res) => {
     req.query.limit = req.query.limit || 10;
@@ -19,7 +21,7 @@ app.get('/users', (req, res) => {
         return res.status(400).end();
     };
 
-    res.json(users.splice(0, limit));
+    res.json(users.slice(0, limit));
 })
 
 app.get('/user/:id', (req, res) => {
@@ -34,8 +36,7 @@ app.get('/user/:id', (req, res) => {
     };
 
     res.json(user);
-})
-
+});
 
 app.delete('/users/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -44,7 +45,15 @@ app.delete('/users/:id', (req, res) => {
     }
     users = users.filter(user => user.id !== id)[0];
     res.status(204).end();
-})
+});
+
+app.post('/users', (req, res) => {
+    const id = Date.now();
+    const name = req.body.name;
+    const user = { id: id, name: name };
+    users.push({ id,  name });
+    res.status(201).json(user);
+});
 
 
 app.listen(3000, function () {
