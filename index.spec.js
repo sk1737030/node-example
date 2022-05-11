@@ -32,12 +32,11 @@ describe('GET /users는', () => {
     })
 })
 
-
 describe('GET /users/1는', () => {
     describe('성공시', () => {
         it('id가 1인 유저 객체를 반환한다', (done) => {
             request(app)
-                .get('/user/1')
+                .get('/users/1')
                 .end((err, res) => {
                     res.body.should.be.property('id', 1);
                     done();
@@ -49,13 +48,13 @@ describe('GET /users/1는', () => {
 describe('실패시', () => {
     it('id가 숫자가 아닐경우 400으로 응답한다', (done) => {
         request(app)
-            .get('/user/one')
+            .get('/users/one')
             .expect(400)
             .end(done);
     })
     it('id로 유저를 찾을 수 없을 경우 404으로 응답한다', (done) => {
         request(app)
-            .get('/user/999')
+            .get('/users/999')
             .expect(404)
             .end(done);
     })
