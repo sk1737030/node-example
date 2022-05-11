@@ -69,15 +69,15 @@ describe('Get /users/1', () => {
                 .expect(204)
                 .end(done)
         })
-    }),
-        describe('실패시', () => {
-            it('id가 숫자가 아닐경우 400으로 응답한다', done => {
-                request(app)
-                    .delete('/users/one')
-                    .expect(400)
-                    .end(done);
-            })
+    });
+    describe('실패시', () => {
+        it('id가 숫자가 아닐경우 400으로 응답한다', done => {
+            request(app)
+                .delete('/users/one')
+                .expect(400)
+                .end(done);
         })
+    });
 })
 
 describe('POST /users', () => {
@@ -95,11 +95,73 @@ describe('POST /users', () => {
                     done();
                 });
         })
-        it ('생성된 유저 객체를 반환한다.', () => {
+        it('생성된 유저 객체를 반환한다.', () => {
             body.should.have.property('id');
         });
-        it ('입력한 Name을 반환한다', () => {
-            body.should.have.property('name', name)
+        it('입력한 Name을 반환한다', () => {
+            body.should.have.property('name')
         });
     });
-})
+
+    describe('실패시', () => {
+        it('name 파라미터 누락시 400을 반환한다', (done) => {
+            request(app)
+                .post('/users')
+                .send({})
+                .expect(400)
+                .end(done)
+        });
+        it('name이 중복일 경우 409를 반환한다. ', (done) => {
+            request(app)
+                .post('/users')
+                .send({ name: 'daniel' })
+                .expect(409)
+                .end(done)
+        });
+    });
+});
+
+describe('PUT /users/:id', () => {
+    describe("성공시", () => {
+        it('변경된 name을 반환한다', (done) => {
+            const name = 'chally';
+            request(app)
+                .put('/users/3')
+                .send({name: name})
+                .end((err, res) => {
+                    res.body.should.have.property('name', name);
+                    done();
+                });
+        });
+    });
+
+    describe('실패시', () => {
+        it('정수가 아닌 id 일 경우 400을 응답한다', done => {
+            request(app)
+                .put('/users/one')
+                .expect(400)
+                .end(done)
+        });
+        it('없는 유저일 경우 404을 응답한다', done => {
+            request(app)
+                .put('/users/999')
+                .send({name: 'foo'})
+                .expect(404)
+                .end(done)
+        });
+        it('빈 객체일 경우 404을 응답한다', done => {
+            request(app)
+                .put('/users/')
+                .expect(404)
+                .end(done)
+        });
+        it('이름이 중복일 경우 409를 응답한다', done => {
+            request(app)
+                .put('/users/3')
+                .send({ name: 'bek' })
+                .expect(409)
+                .end(done)
+        });
+    })
+});
+
